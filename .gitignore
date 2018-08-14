@@ -1,0 +1,6 @@
+.DS_Store
+*.sw[op]
+.idea/
+node_modules/
+chaindata*
+
