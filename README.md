@@ -1,61 +1,83 @@
-# Blockchain Data
+# Private Blockchain
 
-Blockchain has the potential to change the way that the world approaches data. Develop Blockchain skills by understanding the data model behind Blockchain by developing your own simplified private blockchain.
+This project has the purpose of demonstrating the workings of a blockchain data model by leveraging the usage of `LevelDB` as the data layer. There are no consensus algorithms implemented in this project.
 
-## Getting Started
+## Setup
+To install simply clone the repo and run `npm install`.
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+## Tests
+To run tests `npm test`.
 
-### Prerequisites
+Since by design LevelDB can only work with a single process at a time, tests run serially with jest flag `--runInBand` enabled.
 
-Installing Node and NPM is pretty straightforward using the installer package available from the (Node.js® web site)[https://nodejs.org/en/].
+## Data Model
 
-### Configuring your project
+### Block
 
-- Use NPM to initialize your project and create package.json to store project dependencies.
-```
-npm init
-```
-- Install crypto-js with --save flag to save dependency to our package.json file
-```
-npm install crypto-js --save
-```
-- Install level with --save flag
-```
-npm install level --save
-```
-
-## Testing
-
-To test code:
-1: Open a command prompt or shell terminal after install node.js.
-2: Enter a node session, also known as REPL (Read-Evaluate-Print-Loop).
-```
-node
-```
-3: Copy and paste your code into your node session
-4: Instantiate blockchain with blockchain variable
-```
-let blockchain = new Blockchain();
-```
-5: Generate 10 blocks using a for loop
-```
-for (var i = 0; i <= 10; i++) {
-  blockchain.addBlock(new Block("test data "+i));
+#### Properties
+```javascript
+{
+	hash: "", # The current block's hash. Auto-generated when added to the Blockchain.
+	height: 0, # The block's position in the blockchain. Auto-generated when added to the Blockchain.
+	body: "", # Data held in by the block. Manually added on block creation.
+	time: 0, # The block's creation timestamp. Auto-generated when added to the Blockchain.
+	previousBlockHash: "", # The previous block hash. Auto-generated when added to the Blockchain.
 }
 ```
-6: Validate blockchain
+
+#### Constructor
+```javascript
+constructor(data) { ... } 
 ```
-blockchain.validateChain();
-```
-7: Induce errors by changing block data
-```
-let inducedErrorBlocks = [2,4,7];
-for (var i = 0; i < inducedErrorBlocks.length; i++) {
-  blockchain.chain[inducedErrorBlocks[i]].data='induced chain error';
+- data: Used to set the Block.body property.
+
+### Blockchain
+
+#### Properties
+```javascript
+{
+	chain: LevelDB(), # Object used for data persistance through usage of LevelDB.
 }
 ```
-8: Validate blockchain. The chain should now fail with blocks 2,4, and 7.
+
+#### Constructor
+*Not to be used directly.* To create an instance of a blockchain use static method `Blockchain.load(blockchainName)` as described below.
+
+```javascript
+constructor(blockchainName) { ... }
 ```
-blockchain.validateChain();
+- blockchainName: Used to set the database filename used internally by the `LevelDB` class.
+
+#### Methods
+```javascript
+
+# Creates a Blockchain instance. Creates genesis block if blockchain height is 0.
+static load(blockchainName) { ... } returns Blockchain instance
+	
+# Adds a new Block to the Blockchain.
+addBlock(Block) { ... } returns Promise -> Boolean
+	
+# Gets Block object at specified height.
+getBlock((int) height) { ... } returns Promise -> Block
+	
+# Validates Block at specified height.
+validateBlock((int) height) { ... } returns Promise -> Boolean
+
+# Validates whole Blockchain.
+validateChain() { ... } returns Promise -> Boolean
+
+# Get last or most recently created Block in Blockchain.
+getLastBlock() { ... } returns Promise -> Block
+
+# Get current Blockchain height.
+getBlockchainHeight() { ... } returns Promise -> int
+
+# Wrapper around Blockchain.getBlockchainHeight().
+getBlockHeight() { ... } returns Promise -> int
+
 ```
+
+## Usage
+The implementation of this blockchain is heavily Promise-based. There are two main classes that handle all the logic `Blockchain` and `Block`. Underlying logic and persistance is handled through the class `LevelDB` which interfaces as a wrapper with `LevelDB` for persisting blocks.
+
+See 

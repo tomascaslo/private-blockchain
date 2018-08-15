@@ -32,8 +32,8 @@ class Blockchain {
   }
 
   // Initializes the blockchain
-  static async load() {
-    const blockchain = new this();
+  static async load(blockchainName) {
+    const blockchain = new this(blockchainName);
     const amountOfBlocks = await blockchain.getBlockchainHeight();
     const isNewBlockchain = amountOfBlocks <= 0;
     if (isNewBlockchain) {
