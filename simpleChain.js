@@ -81,7 +81,7 @@ class Blockchain {
     if (blockHash === validBlockHash) {
       return true;
     } else {
-      debug('Block #' + blockHeight + ' invalid hash:\n' + blockHash + '<>' + validBlockHash);
+      console.log('Block #' + blockHeight + ' invalid hash:\n' + blockHash + '<>' + validBlockHash);
       return false;
     }
   }
@@ -110,11 +110,11 @@ class Blockchain {
     }
 
     if (errorLog.length > 0) {
-      debug('Block errors = ' + errorLog.length);
-      debug('Blocks: ' + errorLog);
+      console.log('Block errors = ' + errorLog.length);
+      console.log('Blocks: ' + errorLog);
       return false;
     } else {
-      debug('No errors detected');
+      console.log('No errors detected');
       return true;
     }
   }
