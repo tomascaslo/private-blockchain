@@ -17,10 +17,10 @@ Since by design LevelDB can only work with a single process at a time, tests run
 #### Properties
 ```javascript
 {
-	hash: "", # The current block's hash. Auto-generated when added to the Blockchain.
-	height: 0, # The block's position in the blockchain. Auto-generated when added to the Blockchain.
+	hash: "", # The current blocks hash. Auto-generated when added to the Blockchain.
+	height: 0, # The blocks position in the blockchain. Auto-generated when added to the Blockchain.
 	body: "", # Data held in by the block. Manually added on block creation.
-	time: 0, # The block's creation timestamp. Auto-generated when added to the Blockchain.
+	time: 0, # The blocks creation timestamp. Auto-generated when added to the Blockchain.
 	previousBlockHash: "", # The previous block hash. Auto-generated when added to the Blockchain.
 }
 ```
@@ -80,4 +80,4 @@ getBlockHeight() { ... } returns Promise -> int
 ## Usage
 The implementation of this blockchain is heavily Promise-based. There are two main classes that handle all the logic `Blockchain` and `Block`. Underlying logic and persistance is handled through the class `LevelDB` which interfaces as a wrapper with `LevelDB` for persisting blocks.
 
-See 
+See `implementation-usage.js`.
