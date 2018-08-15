@@ -1,3 +1,6 @@
+// You can test this file by running node > 9 interpreter on your cli
+// and running '.load implementation-usage.js'
+
 const { Blockchain, Block } = require('./simpleChain');
 const testUtils = require('./test-utils');
 const rimraf = require('rimraf');
