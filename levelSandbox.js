@@ -106,6 +106,9 @@ class LevelDB {
       .on('data', (data) => {
         i++;
       })
+      .on('error', (err) => {
+        reject(err);
+      })
       .on('close', () => {
         rawDB.close(() => {
           resolve(i);
@@ -122,6 +125,9 @@ class LevelDB {
       rawDB.createValueStream()
       .on('data', () => {
         i++;
+      })
+      .on('error', (err) => {
+        reject(err);
       })
       .on('close', () => {
         return rawDB.get(i-1)
