@@ -33,7 +33,7 @@ class LevelDB {
         reject(new Error(`Incorrect number of arguments ${args.length} for action ${action}`));
       }
       const db = this.getDB((err, db) => {
-        if (err) { reject(err); }
+        if (err) { return reject(err); }
         const result = db[action].apply(db, args)
           .then((val) => {
             db.close(() => {
@@ -71,7 +71,7 @@ class LevelDB {
       return value;
     } catch(err) {
       debug('Not found!', err);
-      throw new err;
+      throw err;
     }
   }
 
