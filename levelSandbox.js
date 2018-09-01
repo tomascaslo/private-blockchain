@@ -25,6 +25,7 @@ class LevelDB {
   }
 
   run(action, ...args) {
+    debug(`Running ${action} with ${args}`);
     return new Promise((resolve, reject) => {
       if (!(action in levelDBActions)) {
         reject(new Error(`Unsupported action ${action}`));
@@ -36,12 +37,20 @@ class LevelDB {
         if (err) { return reject(err); }
         const result = db[action].apply(db, args)
           .then((val) => {
-            db.close(() => {
+            db.close((err) => {
+              debug(`Closing from run(${action}, ${args})`);
+              debug(err);
+              if (err) { return reject(err); }
               resolve(val);
             });
           })
           .catch((err) => {
-            reject(err);
+            db.close((closeErr) => {
+              debug(`Closing from run(${action}, ${args})`);
+              debug(closeErr);
+              if (closeErr) { return reject(closeErr); }
+              reject(err);
+            });
           });
         return result;
       });
@@ -60,6 +69,7 @@ class LevelDB {
       await this.run('put', key, value);
     } catch(err) {
       debug('Block ' + key + ' submission failed', err);
+      throw err;
     }
   }
 
@@ -86,11 +96,15 @@ class LevelDB {
         })
         .on('error',(err) => {
           debug('Unable to read data stream!', err);
-          reject(err);
+          rawDB.close(() => {
+            reject(err);
+          });
         })
         .on('close', () => {
           debug('Block #' + i);
-          rawDB.close(() => {
+          debug('Closing from addDataValue()')
+          rawDB.close((err) => {
+            if (err) { return reject(err); }
             return this.run('put', i, value)
               .then(() => { resolve(); });
           });
@@ -104,17 +118,19 @@ class LevelDB {
     let i = 0;
     return new Promise((resolve, reject) => {
       rawDB.createReadStream()
-      .on('data', (data) => {
-        i++;
-      })
-      .on('error', (err) => {
-        reject(err);
-      })
-      .on('close', () => {
-        rawDB.close(() => {
-          resolve(i);
+        .on('data', (data) => {
+          i++;
+        })
+        .on('error', (err) => {
+          reject(err);
+        })
+        .on('close', () => {
+          debug('Closing from getAmountOfRecords()')
+          rawDB.close((err) => {
+            if (err) { return reject(err); }
+            resolve(i);
+          });
         });
-      });
     });
   }
 
@@ -131,9 +147,11 @@ class LevelDB {
         reject(err);
       })
       .on('close', () => {
+        debug('Closing from getLastRecord()')
         return rawDB.get(i-1)
           .then((val) => {
-            rawDB.close(() => {
+            rawDB.close((err) => {
+              if (err) { return reject(err); }
               resolve(val);
             });
           });

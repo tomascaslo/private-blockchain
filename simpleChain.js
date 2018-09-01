@@ -33,6 +33,7 @@ class Blockchain {
 
   // Initializes the blockchain
   static async load(blockchainName) {
+    debug(`load(${blockchainName})`);
     const blockchain = new this(blockchainName);
     const amountOfBlocks = await blockchain.getBlockchainHeight();
     const isNewBlockchain = amountOfBlocks <= 0;
@@ -45,11 +46,12 @@ class Blockchain {
 
   // Add new block
   async addBlock(newBlock) {
+    debug(`addBlock(${newBlock})`);
     const currentHeight = await this.getBlockchainHeight();
     // Block height
     newBlock.height = currentHeight + 1;
     // UTC timestamp
-    newBlock.time = new Date().getTime().toString().slice(0,-3);
+    newBlock.time = new Date().getTime().toString().slice(0, -3);
     // previous block hash
     if (currentHeight > 0){
       const lastBlock = await this.getLastBlock();
@@ -63,6 +65,7 @@ class Blockchain {
 
   // get block
   async getBlock(blockHeight) {
+    debug(`getBlock(${blockHeight})`);
     const block = await this.chain.getData(blockHeight);
     // return object as a single string
     return JSON.parse(block);
@@ -70,6 +73,7 @@ class Blockchain {
 
   // validate block
   async validateBlock(blockHeight) {
+    debug(`validateBlock(${blockHeight})`);
     // get block object
     const block = await this.getBlock(blockHeight);
     // get block hash
@@ -89,6 +93,7 @@ class Blockchain {
 
   // Validate blockchain
   async validateChain() {
+    debug('validateChain()');
     const chainLength = await this.getBlockchainHeight();
     let errorLog = [];
     for (let i = 0; i < chainLength; i++) {
@@ -122,18 +127,21 @@ class Blockchain {
 
   // Get last block in chain
   async getLastBlock() {
+    debug('getLastBlock()');
     const lastBlock = await this.chain.getLastRecord();
     return JSON.parse(lastBlock);
   }
 
   // Get block height
   async getBlockchainHeight() {
+    debug('getBlockchainHeight()');
     const blockchainHeight = await this.chain.getAmountOfRecords();
     return blockchainHeight;
   }
 
   // Alias to getBlockchainHeight()
   async getBlockHeight() {
+    debug('getBlockHeight()');
     return await this.getBlockchainHeight();
   }
 
