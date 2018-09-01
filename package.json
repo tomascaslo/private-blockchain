@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
+    "run": "node server.js",
     "test": "jest --watch --runInBand --silent"
   },
   "keywords": [
@@ -22,6 +23,7 @@
     "rimraf": "^2.6.2"
   },
   "devDependencies": {
-    "jest": "^23.5.0"
+    "jest": "^23.5.0",
+    "nodemon": "^1.18.4"
   }
 }

@@ -71,6 +71,7 @@ class LevelDB {
       return value;
     } catch(err) {
       debug('Not found!', err);
+      throw new err;
     }
   }
 

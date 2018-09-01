@@ -39,6 +39,7 @@ class Blockchain {
     if (isNewBlockchain) {
       await blockchain.addBlock(new Block("First block in the chain - Genesis block"));
     }
+    debug('Blockchain loaded.')
     return blockchain;
   }
 
