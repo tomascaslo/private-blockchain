@@ -1,16 +1,7 @@
 'use strict';
 
-const express = require('express');
-const bodyParser = require('body-parser');
-const block = require('./api/block');
+const app = require('./app');
 const { Blockchain } = require('./simpleChain');
-const app = express();
-
-// Middleware
-app.use(bodyParser.json());
-
-// Api routes
-app.use('/block', block);
 
 // Load simpleChain before running server
 Blockchain.load().then((blockchain) => {
