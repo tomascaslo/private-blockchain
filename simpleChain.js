@@ -49,7 +49,7 @@ class Blockchain {
     debug(`addBlock(${newBlock})`);
     const currentHeight = await this.getBlockchainHeight();
     // Block height
-    newBlock.height = currentHeight + 1;
+    newBlock.height = currentHeight;
     // UTC timestamp
     newBlock.time = new Date().getTime().toString().slice(0, -3);
     // previous block hash
