@@ -50,10 +50,31 @@ async function invalidateChain(blockchain, blockKey) {
   await rawDB.close();
 }
 
+function resetDB() {
+  const rawDB = (new LevelDB()).getDB();
+  return new Promise((resolve, reject) => {
+    rawDB.createKeyStream()
+      .on('data', (key) => {
+        console.log('Deleting key ' + key);
+        rawDB.del(key);
+      })
+      .on('error', (err) => {
+        reject(err);
+      })
+      .on('end', () => {
+        console.log('Closing db...');
+        rawDB.close(() => {
+          resolve();
+        });
+      });
+  });
+}
+
 module.exports = {
   randomContent,
   createNewBlock,
   createBlockchain,
   addRandomBlocks,
   invalidateChain,
+  resetDB,
 }

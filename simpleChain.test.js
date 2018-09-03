@@ -28,28 +28,12 @@ describe('simpleChain', () => {
   describe('Blockchain', () => {
 
     afterEach(() => {
-      const rawDB = (new LevelDB()).getDB();
-      return new Promise((resolve, reject) => {
-        rawDB.createKeyStream()
-          .on('data', (key) => {
-            console.log('Deleting key ' + key);
-            rawDB.del(key);
-          })
-          .on('error', (err) => {
-            reject(err);
-          })
-          .on('end', () => {
-            console.log('Closing db...');
-            rawDB.close(() => {
-              resolve();
-            });
-          });
-      });
+      return testUtils.resetDB();
     });
 
     afterAll(() => {
       rimraf.sync(`./${dbname}`);
-    })
+    });
 
     test('expect load blockchain with genesis block', async () => {
       const blockchain = await Blockchain.load();
@@ -71,7 +55,7 @@ describe('simpleChain', () => {
     });
 
     test('expect to get block at specified height with getBlock()', async () => {
-      const expectedBlockData = 'some block data'
+      const expectedBlockData = 'some block data';
       const blockchain = await testUtils.createBlockchain();
       await blockchain.addBlock(new Block(expectedBlockData));
       await testUtils.addRandomBlocks(blockchain);
