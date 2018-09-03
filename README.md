@@ -81,3 +81,63 @@ getBlockHeight() { ... } returns Promise -> int
 The implementation of this blockchain is heavily Promise-based. There are two main classes that handle all the logic `Blockchain` and `Block`. Underlying logic and persistance is handled through the class `LevelDB` which interfaces as a wrapper with `LevelDB` for persisting blocks.
 
 See `implementation-usage.js`.
+
+
+## Npm dependencies
+
+* crypto-js
+* level 
+* express
+
+## RESTful API
+This blockchain implements a RESTful API which can be run locally for development with `npm start` which uses nodemon for automatic server reloading. Development server runs on port 8000 by default.
+
+### Endpoints
+---
+`/block/:height`
+
+**Method:** `GET`
+
+**Returns:** JSON with specified block data.
+
+**Example:** 
+
+```bash
+$ curl http://127.0.0.1:8000/block/0
+{
+	"hash":"676d6c8939f466f517a48ae8a354888df14a583f987fb544175354eaba525ea3",
+	"height":0,
+	"body":"First block in the chain - Genesis block",
+	"time":"1536001430",
+	"previousBlockHash":""
+}
+```
+---
+
+`/block`
+
+**Method:** `POST`
+
+**Data:** JSON with `body` attribute.
+
+```json
+{
+	body: string
+}
+```
+
+**Returns:** JSON with newly created block data.
+
+**Example:** 
+
+```bash
+$ curl -X POST -d '{"body": "new block"}' -H 'Content-Type: application/json' http://127.0.0.1:8000/block/
+{
+	"hash":"806a0722dee8f7b44c0a707dad61f4fd7b0f0862baa8d8769846d3af32a00d50",
+	"height":1,
+	"body":"new block",
+	"time":"1536014999",
+	"previousBlockHash":"1f83837c86ad22bab823f4815ab28b498f3b4d781ae33d707f5aaba6afa19923"
+}
+```
+---
