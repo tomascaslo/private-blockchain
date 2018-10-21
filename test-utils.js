@@ -2,7 +2,7 @@
 // Create fixtures and other testing convenient functions
 
 const { Block, Blockchain } = require('./simpleChain');
-const LevelDB = require('./levelSandbox');
+const LevelDB = require('./db/chain');
 
 let base36Chars = '';
 

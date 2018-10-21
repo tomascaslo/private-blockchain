@@ -3,15 +3,15 @@
 const fs = require('fs');
 const rimraf = require('rimraf');
 
-const LevelDB = require('./levelSandbox');
+const ChainDB = require('./chain');
 
 const dbname = 'chaindata-test';
 let testDB = null;
 
-describe('levelSandbox', () => {
+describe('chain', () => {
 
   beforeAll(() => {
-    testDB = new LevelDB(dbname);
+    testDB = new ChainDB(dbname);
   });
 
   afterAll(() => {
@@ -43,7 +43,7 @@ describe('levelSandbox', () => {
   });
 
   test('expect correct name to be set if undefined', () => {
-    let anotherDB = new LevelDB();
+    let anotherDB = new ChainDB();
     let expectedName = 'chaindata-test';
 
     expect(anotherDB.fileName).toBe(expectedName);
@@ -83,11 +83,11 @@ describe('levelSandbox', () => {
     expect(value2).toBe('newValue2');
   });
 
-  test('expect to get the correct amount of records with getAmountOfRecords()', async () => {
+  test('expect to get the correct amount of records with getChainLength()', async () => {
     for (let i = 0; i < 10; i++) {
       await testDB.addDataValue(i.toString());
     }
-    const amount = await testDB.getAmountOfRecords();
+    const amount = await testDB.getChainLength();
 
     expect(amount).toBe(10);
   });

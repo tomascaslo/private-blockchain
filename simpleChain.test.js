@@ -3,7 +3,7 @@
 const rimraf = require('rimraf');
 
 const { Block, Blockchain } = require('./simpleChain');
-const LevelDB = require('./levelSandbox');
+const ChainDB = require('./db/chain');
 const testUtils = require('./test-utils');
 
 const dbname = 'chaindata-test';
@@ -37,7 +37,7 @@ describe('simpleChain', () => {
 
     test('expect load blockchain with genesis block', async () => {
       const blockchain = await Blockchain.load();
-      const rawDB = await (new LevelDB(dbname)).getDB();
+      const rawDB = await (new ChainDB(dbname)).getDB();
       const genesisBlock = await rawDB.get(0);
       await rawDB.close()
 
@@ -84,7 +84,7 @@ describe('simpleChain', () => {
       // Insert invalid block hash
       const block = await blockchain.getBlock(testBlockPosition);
       block.hash = testUtils.randomContent();
-      const rawDB = await (new LevelDB()).getDB();
+      const rawDB = await (new ChainDB()).getDB();
       await rawDB.put(testBlockPosition, JSON.stringify(block));
       await rawDB.close();
 
@@ -104,7 +104,7 @@ describe('simpleChain', () => {
     test('expect blockchain to be invalid with validateChain()', async () => {
       const testBlockPosition = 5;
       const blockchain = await testUtils.createBlockchain(10);
-      const rawDB = await (new LevelDB).getDB();
+      const rawDB = await (new ChainDB()).getDB();
       // Modify a single block's content
       const block = JSON.parse(await rawDB.get(testBlockPosition));
       block.body = testUtils.randomContent();

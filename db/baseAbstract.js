@@ -1,30 +1,26 @@
 'use strict';
-/* ===== Persist data with LevelDB ===================================
-|  Learn more: level: https://github.com/Level/level     |
-|  =============================================================*/
+// Base level abstract class.
 
 const level = require('level');
-const debug = require('debug')('levelSandbox');
+const debug = require('debug')('BaseDB');
 
-const npmEvent = process.env.npm_lifecycle_event;
-const defaultDBName = npmEvent ? 'chaindata-' + npmEvent : 'chaindata';
-
-
-// Supported levelDB actions
-// nargs - refers to the number of arguments for action
-const levelDBActions = {
-  'put': {'nargs': 2},
-  'get': {'nargs': 1},
-}
-
-class LevelDB {
+class BaseDB {
 
   constructor(dbName) {
-    this.fileName = dbName || defaultDBName;
+    this.fileName = dbName || this.getDefaultName();
     this.dbFile = `./${this.fileName}`;
   }
 
+  getDefaultName() {
+    throw new Error('getDefaultName() method not implemented.');
+  }
+
+  getActions() {
+    throw new Error('getActions() method not implemented.');
+  }
+
   run(action, ...args) {
+    const levelDBActions = this.getActions();
     debug(`Running ${action} with ${args}`);
     return new Promise((resolve, reject) => {
       if (!(action in levelDBActions)) {
@@ -85,33 +81,6 @@ class LevelDB {
     }
   }
 
-  // Add data to levelDB with value
-  addDataValue(value) {
-    const rawDB = this.getDB();
-    let i = 0;
-    return new Promise((resolve, reject) => {
-      rawDB.createReadStream()
-        .on('data', (data) => {
-          i++;
-        })
-        .on('error',(err) => {
-          debug('Unable to read data stream!', err);
-          rawDB.close(() => {
-            reject(err);
-          });
-        })
-        .on('close', () => {
-          debug('Block #' + i);
-          debug('Closing from addDataValue()')
-          rawDB.close((err) => {
-            if (err) { return reject(err); }
-            return this.run('put', i, value)
-              .then(() => { resolve(); });
-          });
-        });
-    });
-  }
-
   // Get amount of records
   getAmountOfRecords() {
     const rawDB = this.getDB();
@@ -134,30 +103,6 @@ class LevelDB {
     });
   }
 
-  // Get last of records
-  getLastRecord() {
-    const rawDB = this.getDB();
-    let i = 0;
-    return new Promise((resolve, reject) => {
-      rawDB.createValueStream()
-      .on('data', () => {
-        i++;
-      })
-      .on('error', (err) => {
-        reject(err);
-      })
-      .on('close', () => {
-        debug('Closing from getLastRecord()')
-        return rawDB.get(i-1)
-          .then((val) => {
-            rawDB.close((err) => {
-              if (err) { return reject(err); }
-              resolve(val);
-            });
-          });
-      });
-    });
-  }
 }
 
-module.exports = LevelDB;
+module.exports = BaseDB;

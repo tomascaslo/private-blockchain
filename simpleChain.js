@@ -6,7 +6,7 @@
 const SHA256 = require('crypto-js/sha256');
 const debug = require('debug')('simpleChain');
 
-const LevelDB = require('./levelSandbox');
+const ChainDB = require('./db/chain');
 
 /* ===== Block Class ==============================
 |  Class with a constructor for block 			   |
@@ -28,7 +28,7 @@ class Block{
 
 class Blockchain {
   constructor(blockchainName) {
-    this.chain = new LevelDB(blockchainName);
+    this.chain = new ChainDB(blockchainName);
   }
 
   // Initializes the blockchain
@@ -135,7 +135,7 @@ class Blockchain {
   // Get block height
   async getBlockchainHeight() {
     debug('getBlockchainHeight()');
-    const blockchainHeight = await this.chain.getAmountOfRecords();
+    const blockchainHeight = await this.chain.getChainLength();
     return blockchainHeight;
   }
 
