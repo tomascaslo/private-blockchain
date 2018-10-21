@@ -6,7 +6,8 @@
   "scripts": {
     "start": "nodemon server.js",
     "run": "node server.js",
-    "test": "jest --watch --runInBand --silent"
+    "test": "jest --watch --runInBand --silent",
+    "posttest": "rimraf chaindata-test notary-test"
   },
   "keywords": [
     "private-blockchain",

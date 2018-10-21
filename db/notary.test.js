@@ -15,7 +15,7 @@ describe('notary', function() {
   });
 
   afterAll(() => {
-    rimraf.sync(`./${dbname}`);
+    rimraf.sync(`./${dbName}`);
   });
 
   afterEach(() => {

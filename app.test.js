@@ -6,9 +6,14 @@ const { Block, Blockchain } = require('./simpleChain');
 const app = require('./app');
 const testUtils = require('./test-utils');
 
-const dbname = 'chaindata-test';
+const dbName = 'chaindata-test';
+const notaryDbName = 'notary-test';
 
 describe('api', () => {
+  afterAll(() => {
+    rimraf.sync(`./${dbName}`);
+    rimraf.sync(`./${notaryDbName}`);
+  });
 
   beforeEach(async () => {
     global.blockchain = await Blockchain.load();
@@ -16,10 +21,6 @@ describe('api', () => {
 
   afterEach(() => {
     return testUtils.resetDB();
-  });
-
-  afterAll(() => {
-    rimraf.sync(`./${dbname}`);
   });
 
   describe('GET /block/:height', () => {
@@ -86,6 +87,36 @@ describe('api', () => {
       expect(response.statusCode).toBe(500);
       expect(response.text.trim().toLowerCase()).toEqual('internal server error');
       addBlockMock.mockRestore();
+    });
+
+  });
+
+  describe('POST /requestValidation', () => {
+
+    test('expect to return address data when on first request', async () => {
+      const endpoint = '/requestValidation';
+      const response = await request(app)
+        .post(endpoint)
+        .set('Content-Type', 'application/json')
+        .send({address: 'someaddress'});
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toBeTruthy();
+    });
+
+    test('expect to return existing address data', async () => {
+      const endpoint = '/requestValidation';
+      const address = 'someaddress';
+      // This should create the initial data for address
+      const initialResponse = await request(app)
+        .post(endpoint)
+        .set('Content-Type', 'application/json')
+        .send({address});
+      const response = await request(app)
+        .post(endpoint)
+        .set('Content-Type', 'application/json')
+        .send({address});
+      expect(response.statusCode).toBe(200);
+      expect(initialResponse.body).toEqual(response.body);
     });
 
   });

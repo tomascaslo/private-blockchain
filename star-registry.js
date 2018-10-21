@@ -40,6 +40,9 @@ class StarRegistry {
     if (!data) {
       return false;
     }
+    if (typeof data === 'string' || data instanceof String) {
+      data = JSON.parse(data);
+    }
     const now = new Date().getTime() / 1000; // UTC sec
 
     return (now - (data.timestamp / 1000)) < data.validationWindow;

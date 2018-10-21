@@ -2,7 +2,7 @@
 // Create fixtures and other testing convenient functions
 
 const { Block, Blockchain } = require('./simpleChain');
-const LevelDB = require('./db/chain');
+const ChainDB = require('./db/chain');
 
 let base36Chars = '';
 
@@ -43,7 +43,7 @@ async function addRandomBlocks(blockchain, numBlocks=10) {
 }
 
 async function invalidateChain(blockchain, blockKey) {
-  const rawDB = (new LevelDB(blockchain.chain.fileName)).getDB();
+  const rawDB = (new ChainDB(blockchain.chain.fileName)).getDB();
   const block = JSON.parse(await rawDB.get(blockKey));
   block.body = randomContent();
   await rawDB.put(blockKey, JSON.stringify(block));
@@ -51,7 +51,7 @@ async function invalidateChain(blockchain, blockKey) {
 }
 
 function resetDB() {
-  const rawDB = (new LevelDB()).getDB();
+  const rawDB = (new ChainDB()).getDB();
   return new Promise((resolve, reject) => {
     rawDB.createKeyStream()
       .on('data', (key) => {
