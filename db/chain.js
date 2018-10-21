@@ -5,7 +5,7 @@
 
 const level = require('level');
 const debug = require('debug')('db:chain');
-const BaseDB = require('./baseAbstract');
+const BaseDB = require('./base-abstract');
 
 const npmEvent = process.env.npm_lifecycle_event;
 const defaultDBName = npmEvent ? 'chaindata-' + npmEvent : 'chaindata';

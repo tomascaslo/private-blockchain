@@ -39,12 +39,12 @@ describe('chain', () => {
   });
 
   test('expect correct name to be set', () => {
-    expect(testDB.fileName).toBe('chaindata-test');
+    expect(testDB.fileName).toBe(dbName);
   });
 
   test('expect correct name to be set if undefined', () => {
     let anotherDB = new ChainDB();
-    let expectedName = 'chaindata-test';
+    let expectedName = dbName;
 
     expect(anotherDB.fileName).toBe(expectedName);
   });
@@ -69,6 +69,16 @@ describe('chain', () => {
     const result = await testDB.getData(key);
 
     expect(result).toBe(expectedValue);
+  });
+
+  test('expect data to throw error on getData() and key doesnt exist in levelDB', async () => {
+    const key = 'key';
+
+    try {
+      await testDB.getData(key);
+    } catch(err) {
+      expect(err).toBeTruthy();
+    }
   });
 
   test('expect data value to be added to levelDB with addDataValue()', async () => {
