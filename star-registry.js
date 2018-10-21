@@ -36,6 +36,19 @@ class StarRegistry {
     return await this.notary.saveData(addressData);
   }
 
+  async validateRequestSignature(address, signature) {
+    return await Promise.resolve({
+        'registerStar': true,
+        'status': {
+          'address': '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ',
+          'requestTimeStamp': '1532296090',
+          'message': '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ:1532296090:starRegistry',
+          'validationWindow': 193,
+          'messageSignature': 'valid'
+        }
+    });
+  }
+
   isWithinValidationWindow(data) {
     if (!data) {
       return false;
