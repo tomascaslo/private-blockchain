@@ -28,6 +28,7 @@ describe('StarRegistry', () => {
     };
     await testDB.saveData(data);
     starRegistry.isWithinValidationWindow = jest.fn().mockReturnValueOnce(true);
+    starRegistry.updateTimestamp = jest.fn().mockResolvedValueOnce(data);
     const result = await starRegistry.getOrCreateDataForAddress(address);
 
     expect(result).toEqual(data);
@@ -81,6 +82,21 @@ describe('StarRegistry', () => {
     };
 
     expect(starRegistry.isWithinValidationWindow(data)).toBeTruthy();
+  });
+
+  test('expect updateTimestamp() to update validationWindow attr', async () => {
+    const starRegistry = new StarRegistry();
+    const address = 'someaddress';
+    const timestamp = new Date().getTime() - (100 * 1000);
+    const data = {
+      address,
+      timestamp,
+      message: `${address}:${timestamp}:starRegistry`,
+      validationWindow: 300
+    };
+    const result = await starRegistry.updateTimestamp(data);
+
+    expect(result.validationWindow).not.toBe(data.validationWindow);
   });
 
 });

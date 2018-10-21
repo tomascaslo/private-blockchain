@@ -3,6 +3,7 @@
 
 const { Block, Blockchain } = require('./simpleChain');
 const ChainDB = require('./db/chain');
+const NotaryDB = require('./db/notary');
 
 let base36Chars = '';
 
@@ -50,20 +51,29 @@ async function invalidateChain(blockchain, blockKey) {
   await rawDB.close();
 }
 
-function resetDB() {
+function resetChainDB() {
   const rawDB = (new ChainDB()).getDB();
+  return resetDB(rawDB);
+}
+
+function resetNotaryDB() {
+  const rawDB = (new NotaryDB()).getDB();
+  return resetDB(rawDB);
+}
+
+function resetDB(db) {
   return new Promise((resolve, reject) => {
-    rawDB.createKeyStream()
+    db.createKeyStream()
       .on('data', (key) => {
         console.log('Deleting key ' + key);
-        rawDB.del(key);
+        db.del(key);
       })
       .on('error', (err) => {
         reject(err);
       })
       .on('end', () => {
         console.log('Closing db...');
-        rawDB.close(() => {
+        db.close(() => {
           resolve();
         });
       });
@@ -76,5 +86,6 @@ module.exports = {
   createBlockchain,
   addRandomBlocks,
   invalidateChain,
-  resetDB,
+  resetChainDB,
+  resetNotaryDB,
 }

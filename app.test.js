@@ -20,7 +20,10 @@ describe('api', () => {
   });
 
   afterEach(() => {
-    return testUtils.resetDB();
+    return Promise.all([
+      testUtils.resetChainDB(),
+      testUtils.resetNotaryDB(),
+    ]);
   });
 
   describe('GET /block/:height', () => {
@@ -116,7 +119,10 @@ describe('api', () => {
         .set('Content-Type', 'application/json')
         .send({address});
       expect(response.statusCode).toBe(200);
-      expect(initialResponse.body).toEqual(response.body);
+      expect(initialResponse.body.address).toBe(response.body.address);
+      expect(initialResponse.body.timestamp).toBe(response.body.timestamp);
+      expect(initialResponse.body.message).toBe(response.body.message);
+      expect(initialResponse.body.validationWindow).not.toBe(response.body.validationWindow);
     });
 
   });

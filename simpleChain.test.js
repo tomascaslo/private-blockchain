@@ -28,7 +28,7 @@ describe('simpleChain', () => {
   describe('Blockchain', () => {
 
     afterEach(() => {
-      return testUtils.resetDB();
+      return testUtils.resetChainDB();
     });
 
     afterAll(() => {
