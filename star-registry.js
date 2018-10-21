@@ -10,28 +10,16 @@ class StarRegistry {
     this.notary = new NotaryDB();
   }
 
-  // Overrides getData()
-  async getData(key){
-    try {
-      let value = await this.run('get', key);
-      debug('Value = ' + value);
-      return value;
-    } catch(err) {
-      debug('Not found!', err);
-      return null;
-    }
-  }
-
   async getAddressData(address) {
     return await this.getOrCreateDataForAddress(address);
   }
 
   async getOrCreateDataForAddress(address) {
     const data = await this.notary.getData(address);
-    if (data && this.isWithinValidationWindow()) {
-      return data;
+    if (data && this.isWithinValidationWindow(data)) {
+      return JSON.parse(data);
     } else {
-      return await createDataForAddress(address);
+      return await this.createDataForAddress(address);
     }
   }
 
@@ -45,7 +33,7 @@ class StarRegistry {
       validationWindow: VALIDATION_WINDOW,
     };
 
-    return await saveData(addressData);
+    return await this.notary.saveData(addressData);
   }
 
   isWithinValidationWindow(data) {
@@ -54,7 +42,7 @@ class StarRegistry {
     }
     const now = new Date().getTime() / 1000; // UTC sec
 
-    return (now - (timestamp / 1000)) < data.validationWindow;
+    return (now - (data.timestamp / 1000)) < data.validationWindow;
   }
 
 }

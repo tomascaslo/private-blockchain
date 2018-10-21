@@ -5,17 +5,17 @@ const rimraf = require('rimraf');
 
 const ChainDB = require('./chain');
 
-const dbname = 'chaindata-test';
+const dbName = 'chaindata-test';
 let testDB = null;
 
 describe('chain', () => {
 
   beforeAll(() => {
-    testDB = new ChainDB(dbname);
+    testDB = new ChainDB(dbName);
   });
 
   afterAll(() => {
-    rimraf.sync(`./${dbname}`);
+    rimraf.sync(`./${dbName}`);
   });
 
   afterEach(() => {

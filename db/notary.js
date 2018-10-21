@@ -24,8 +24,20 @@ class NotaryDB extends BaseDB {
     return chainDBActions;
   }
 
+  // Overrides getData()
+  async getData(key){
+    try {
+      let value = await this.run('get', key);
+      debug('Value = ' + value);
+      return value;
+    } catch(err) {
+      debug('Not found!', err);
+      return null;
+    }
+  }
+
   async saveData(data) {
-    await this.run('put', data.address, data);
+    await this.run('put', data.address, JSON.stringify(data));
     return data;
   }
 

@@ -64,7 +64,6 @@ class BaseDB {
     try {
       await this.run('put', key, value);
     } catch(err) {
-      debug('Block ' + key + ' submission failed', err);
       throw err;
     }
   }
