@@ -3,13 +3,14 @@
 const express = require('express');
 const debug = require('debug')('api:notary');
 const { Block } = require('../simpleChain');
+const { StarRegistry } = require('../star-registry')
 const { NotFound, InternalServerError } = require('./utils/http-status-codes');
 const router = express.Router();
 
 router
 .post('/requestValidation', async (req, res) => {
-  const blockchainID = req.body.address;
-  const timestamp = new Date().getTime();
+  const address = req.body.address;
+  const data = StarRegistry().getOrCreateDataForAddress(address);
 
-  res.json()
+  res.json(data);
 });

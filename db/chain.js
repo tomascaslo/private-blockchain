@@ -85,10 +85,6 @@ class ChainDB extends BaseDB {
     });
   }
 
-  getActions() {
-    return chainDBActions;
-  }
-
 }
 
 module.exports = ChainDB;

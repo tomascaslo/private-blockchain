@@ -24,6 +24,11 @@ class NotaryDB extends BaseDB {
     return chainDBActions;
   }
 
+  async saveData(data) {
+    await this.run('put', data.address, data);
+    return data;
+  }
+
 }
 
 module.exports = NotaryDB;
