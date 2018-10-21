@@ -28,7 +28,7 @@ class StarRegistry {
 
   async getOrCreateDataForAddress(address) {
     const data = await this.notary.getData(address);
-    if (data) {
+    if (data && this.isWithinValidationWindow()) {
       return data;
     } else {
       return await createDataForAddress(address);
@@ -36,7 +36,7 @@ class StarRegistry {
   }
 
   async createDataForAddress(address) {
-    const timestamp = new Date().getTime(); // UTC
+    const timestamp = new Date().getTime(); // UTC ms
     const message = `${address}:${timestamp}:starRegistry`;
     const addressData = {
       address,
@@ -46,6 +46,15 @@ class StarRegistry {
     };
 
     return await saveData(addressData);
+  }
+
+  isWithinValidationWindow(data) {
+    if (!data) {
+      return false;
+    }
+    const now = new Date().getTime() / 1000; // UTC sec
+
+    return (now - (timestamp / 1000)) < data.validationWindow;
   }
 
 }
