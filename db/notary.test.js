@@ -66,13 +66,13 @@ describe('notary', function() {
 
   test('expect data to be retrieved correctly from levelDB with getData()', async () => {
     const key = 'key';
-    const expectedValue = 'value';
+    const expectedValue = JSON.stringify({'value': 'value'});
     const rawDB = testDB.getDB();
     await rawDB.put(key, expectedValue);
     await rawDB.close()
     const result = await testDB.getData(key);
 
-    expect(result).toBe(expectedValue);
+    expect(result).toEqual(JSON.parse(expectedValue));
   });
 
   test('expect data to be retrieved null on getData() and key doesnt exist in levelDB', async () => {

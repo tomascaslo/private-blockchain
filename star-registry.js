@@ -1,6 +1,8 @@
 'use strict';
 
 const NotaryDB = require('./db/notary');
+const bitcoin = require('bitcoinjs-lib');
+const bitcoinMessage = require('bitcoinjs-message'); 
 
 const VALIDATION_WINDOW = 300; // seconds
 
@@ -17,7 +19,6 @@ class StarRegistry {
   async getOrCreateDataForAddress(address) {
     let data = await this.notary.getData(address);
     if (data && this.isWithinValidationWindow(data)) {
-      data = JSON.parse(data);
       data = await this.updateTimestamp(data);
       return data;
     } else {
@@ -39,16 +40,25 @@ class StarRegistry {
   }
 
   async validateRequestSignature(address, signature) {
-    return await Promise.resolve({
-        'registerStar': true,
-        'status': {
-          'address': '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ',
-          'requestTimeStamp': '1532296090',
-          'message': '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ:1532296090:starRegistry',
-          'validationWindow': 193,
-          'messageSignature': 'valid'
-        }
-    });
+    const data = await this.notary.getData(address);
+    if (!this.isWithinValidationWindow(data)) {
+      throw Error('Invalid or expired request');
+    }
+    const message = data.message;
+    const updatedData = await this.updateTimestamp(data);
+    const registration = {
+      'status': updatedData
+    };
+
+    if (bitcoinMessage.verify(message, address, signature)) {
+      registration.registerStar = true;
+      registration.status.messageSignature = 'valid';
+    } else {
+      registration.registerStar = false;
+      registration.status.messageSignature = 'invalid';
+    }
+
+    return registration;
   }
 
   isWithinValidationWindow(data) {
@@ -64,11 +74,16 @@ class StarRegistry {
   }
 
   async updateTimestamp(data) {
-    const now = new Date().getTime(); // UTC ms
-    const newValidationWindow = VALIDATION_WINDOW - (now - data.timestamp);
-    data = Object.assign({}, data, {validationWindow: newValidationWindow});
+    data = Object.assign({}, data, { validationWindow: this.getNewValidationWindow(data) });
 
     return await this.notary.saveData(data);
+  }
+
+  getNewValidationWindow(data) {
+    const now = new Date().getTime() / 1000; // UTC ms
+    const newValidationWindow = VALIDATION_WINDOW - (now - (data.timestamp / 1000));
+
+    return Math.floor(newValidationWindow);
   }
 
 }

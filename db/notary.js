@@ -29,7 +29,7 @@ class NotaryDB extends BaseDB {
     try {
       let value = await this.run('get', key);
       debug('Value = ' + value);
-      return value;
+      return JSON.parse(value);
     } catch(err) {
       debug('Not found!', err);
       return null;
