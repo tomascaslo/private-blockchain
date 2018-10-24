@@ -25,7 +25,6 @@ router
   }
 })
 .post('/', async (req, res, next) => {
-  // Get request body data
   const body = req.body.body || '';
   const blockchain = global.blockchain;
   // Create new block

@@ -7,23 +7,43 @@ const SHA256 = require('crypto-js/sha256');
 const debug = require('debug')('simpleChain');
 
 const ChainDB = require('./db/chain');
+const { validateProperty } = require('./utils');
 
 /* ===== Block Class ==============================
-|  Class with a constructor for block 			   |
+|  Class with a constructor for block          |
 |  ===============================================*/
 
-class Block{
+class Block {
   constructor(data) {
     this.hash = "";
     this.height = 0;
-    this.body = data;
+    this.body = BlockBody(data);
     this.time = 0;
     this.previousBlockHash = "";
   }
 }
 
+/* ===== Block body Class ==============================
+|  Class with a constructor for block body        |
+|  ===============================================*/
+// TODO: Move this to Star registry since this is more related to that.
+
+class BlockBody {
+  constructor(body) {
+    let { address, star = {} } = body;
+    let { dec, ra, story, mag, con } = star;
+    this.address = address;
+    this.star = star;
+    this.star.dec = validateProperty(star, 'dec', true);
+    this.star.ra = validateProperty(star, 'ra', true);
+    this.star.story = validateProperty(star, 'story', true);
+    this.star.mag = validateProperty(star, 'mag');
+    this.star.con = validateProperty(star, 'con');
+  }
+}
+
 /* ===== Blockchain Class ==========================
-|  Class with a constructor for new blockchain 		|
+|  Class with a constructor for new blockchain    |
 |  ================================================*/
 
 class Blockchain {
@@ -149,5 +169,6 @@ class Blockchain {
 
 module.exports = {
   Block,
+  BlockBody,
   Blockchain,
 };
