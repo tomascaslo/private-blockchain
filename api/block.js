@@ -3,6 +3,7 @@
 const express = require('express');
 const debug = require('debug')('api:block');
 const { Block } = require('../simpleChain');
+const Star = require('../star');
 const { NotFound, InternalServerError } = require('./utils/http-status-codes');
 const router = express.Router();
 
@@ -25,10 +26,11 @@ router
   }
 })
 .post('/', async (req, res, next) => {
-  const body = req.body.body || '';
   const blockchain = global.blockchain;
+  const body = req.body.body || {};
+  const star = new Star(body);
   // Create new block
-  const block = new Block(body);
+  const block = new Block(star);
 
   try {
     await blockchain.addBlock(block);

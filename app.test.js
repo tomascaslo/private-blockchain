@@ -10,6 +10,7 @@ const dbName = 'chaindata-test';
 const notaryDbName = 'notary-test';
 
 describe('api', () => {
+
   afterAll(() => {
     rimraf.sync(`./${dbName}`);
     rimraf.sync(`./${notaryDbName}`);
@@ -27,11 +28,23 @@ describe('api', () => {
   });
 
   describe('GET /block/:height', () => {
+    let star;
+
+    beforeEach(() => {
+      star = {
+        'address': '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ',
+        'star': {
+          'dec': "-26° 29'\'' 24.9",
+          'ra': '16h 29m 1.0s',
+          'story': 'Found star using https://www.google.com/sky/'
+        }
+      };
+    });
 
     test('expect to get correct block', async () => {
       const blockHeight = 11;
       const endpoint = `/block/${blockHeight}`;
-      const expectedBlockData = 'block 11 data'
+      const expectedBlockData = star;
       const blockchain = await testUtils.createBlockchain();
       await blockchain.addBlock(new Block(expectedBlockData));
       await testUtils.addRandomBlocks(blockchain);
@@ -46,7 +59,7 @@ describe('api', () => {
     test('expect to return 404 on height not found', async () => {
       const blockHeight = 11;
       const endpoint = `/block/${blockHeight}`;
-      const expectedBlockData = 'block 11 data'
+      const expectedBlockData = star;
       const blockchain = await testUtils.createBlockchain();
 
       const response = await request(app).get(endpoint);
@@ -56,11 +69,23 @@ describe('api', () => {
   });
 
   describe('POST /block', () => {
+    let star;
+
+    beforeEach(() => {
+      star = {
+        'address': '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ',
+        'star': {
+          'dec': "-26° 29'\'' 24.9",
+          'ra': '16h 29m 1.0s',
+          'story': 'Found star using https://www.google.com/sky/'
+        }
+      };
+    });
 
     test('expect to create block correctly', async () => {
       const blockHeight = 6;
       const endpoint = `/block`;
-      const expectedBlockData = 'block 6 data'
+      const expectedBlockData = star;
       const blockchain = await testUtils.createBlockchain(5);
 
       const response = await request(app)
@@ -76,7 +101,7 @@ describe('api', () => {
     test('expect to return 500 on block creation failure', async () => {
       const blockHeight = 13;
       const endpoint = `/block`;
-      const expectedBlockData = 'block 13 data'
+      const expectedBlockData = star;
       const blockchain = global.blockchain = await testUtils.createBlockchain(12);
 
       const addBlockMock = blockchain.addBlock = jest.fn().mockImplementation(() => {

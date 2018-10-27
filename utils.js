@@ -1,13 +1,13 @@
 'use strict';
 
-function validateProperty(obj, prop, required=false, default=null) {
+function validateProperty(obj, prop, required=false) {
   if (prop in obj) {
     const val = obj[prop];
-    if (required && val == null) {
+    if (required && (val == null || (typeof val === 'string' && !val.trim()))) {
       propertyRequiredError(prop);
     } else {
       if (typeof val === 'undefined') {
-        return default;
+        return null;
       } else {
         return val;
       }
@@ -15,9 +15,6 @@ function validateProperty(obj, prop, required=false, default=null) {
   } else {
     if (required) {
       propertyRequiredError(prop);
-    } else {
-      obj[prop] = default;
-      return default;
     }
   }
 }
