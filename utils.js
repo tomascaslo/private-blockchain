@@ -16,6 +16,7 @@ function validateProperty(obj, prop, required=false) {
     if (required) {
       propertyRequiredError(prop);
     }
+    return null;
   }
 }
 

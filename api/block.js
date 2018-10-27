@@ -27,7 +27,7 @@ router
 })
 .post('/', async (req, res, next) => {
   const blockchain = global.blockchain;
-  const body = req.body.body || {};
+  const body = req.body || {};
   const star = new Star(body);
   // Create new block
   const block = new Block(star);
