@@ -30,7 +30,7 @@ class ChainDB extends BaseDB {
 
   // Get blockchain length
   async getChainLength() {
-    return this.getAmountOfRecords();
+    return await this.getAmountOfRecords();
   }
 
   // Add data to levelDB with value
@@ -83,6 +83,52 @@ class ChainDB extends BaseDB {
           });
       });
     });
+  }
+
+  /*
+   * This function assumes the data in LevelDB is saved
+   * as a dumped JSON and search for objects with property
+   * `key` that match the specified value in `value`.
+   * Set `firstMatch` to true to return just the first object found. Defaults to false.
+   * Supports nested objects. Keys separated by `.`.
+   *
+   * Returns an Array of the matching objects.
+   */
+  findEntriesByObjectProp(keyString, value, firstMatch=false) {
+    const rawDB = this.getDB();
+    const entries = [];
+    return new Promise((resolve, reject) => {
+      rawDB.createReadStream({keys: false, values: true})
+        .on('data', (data) => {
+          let parsedData = JSON.parse(data);
+          if (this.getValueForKeyString(parsedData, keyString) === value) {
+            entries.push(parsedData);
+          }
+        })
+        .on('error', (err) => {
+          reject(err);
+        })
+        .on('close', () => {
+          debug('Ending from findEntriesByObjectProperty()');
+          rawDB.close((err) => {
+            if (err) { return reject(err); }
+            resolve(entries);
+          });
+        });
+    });
+  }
+
+  getValueForKeyString(obj, keyString) {
+    const keyList = keyString.split('.');
+    let value = obj;
+    let i;
+    for (i = 0; i < keyList.length; i++) {
+      value = value[keyList[i]];
+      if (typeof value === 'undefined') {
+        return undefined;
+      }
+    }
+    return value;
   }
 
 }

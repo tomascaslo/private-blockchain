@@ -93,7 +93,7 @@ class BaseDB {
           reject(err);
         })
         .on('close', () => {
-          debug('Closing from getAmountOfRecords()')
+          debug('Closing from getAmountOfRecords()');
           rawDB.close((err) => {
             if (err) { return reject(err); }
             resolve(i);

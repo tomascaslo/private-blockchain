@@ -27,6 +27,7 @@ class Block {
 |  ================================================*/
 
 class Blockchain {
+
   constructor(blockchainName) {
     this.chain = new ChainDB(blockchainName);
   }

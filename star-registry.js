@@ -8,8 +8,9 @@ const VALIDATION_WINDOW = 300; // seconds
 
 class StarRegistry {
 
-  constructor() {
+  constructor(blockchain) {
     this.notary = new NotaryDB();
+    this.blockchain = blockchain.chain;
   }
 
   async getAddressData(address) {
@@ -84,6 +85,18 @@ class StarRegistry {
     const newValidationWindow = VALIDATION_WINDOW - (now - (data.timestamp / 1000));
 
     return Math.floor(newValidationWindow);
+  }
+
+  async getStarsForAddress(address) {
+    console.log(this.blockchain);
+    return await this.blockchain.findEntriesByObjectProp('body.address', address);
+  }
+
+  async getStarByHash(hash) {
+    const firstMatch = true;
+    const entries = await this.blockchain.findEntriesByObjectProp('hash', hash, firstMatch);
+    const star = entries.length > 0 ? entries[0] : null;
+    return star;
   }
 
 }
