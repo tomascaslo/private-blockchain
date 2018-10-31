@@ -93,12 +93,255 @@ See `implementation-usage.js`.
 This blockchain implements a RESTful API which can be run locally for development with `npm start` which uses nodemon for automatic server reloading. Development server runs on port 8000 by default.
 
 ### Endpoints
+
 ---
-`/block/:height`
+
+`/requestValidation`
+
+**Method:** `POST`
+
+**Data:** JSON with `address` attribute.
+
+```json
+{
+	address: string
+}
+```
+
+**Returns:** JSON with to be signed message.
+
+```json
+{
+    address: string,
+    timestamp: date,
+    message: string,
+    validationWindow: int
+}
+```
+
+**Example:** 
+
+```bash
+$ curl -X POST -d '{"address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF"}' -H 'Content-Type: application/json' http://127.0.0.1:8000/requestValidation
+{
+    "address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF",
+    "timestamp": 1540957704748,
+    "message": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF:1540957704748:starRegistry",
+    "validationWindow": 300
+}
+```
+---
+
+`/message-signature/validate`
+
+**Method:** `POST`
+
+**Data:** JSON with `address` and `signature` attributes.
+
+```json
+{
+	address: string,
+	signature: string
+}
+```
+
+**Returns:** JSON with status for star registration.
+
+```json
+{
+    status: {
+        address: string,
+        timestamp: date,
+        message: string,
+        validationWindow: int,
+        messageSignature: string
+    },
+    registerStar: bool
+}
+```
+
+**Example:** 
+
+```bash
+$ curl -X POST -d '{"address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF", "signature": "HzETcGrAPcaJ2Z2jU2cd3iPytEbbfbTK+V5SkvT7EXqZDwrp7HDS7Sz/L8Ve4r/JyfCQssOQS0BxPbNDp3m0FUQ="}' -H 'Content-Type: application/json' http://127.0.0.1:8000/message-signature/validate
+{
+    "status": {
+        "address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF",
+        "timestamp": 1540957704748,
+        "message": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF:1540957704748:starRegistry",
+        "validationWindow": 243,
+        "messageSignature": "valid"
+    },
+    "registerStar": true
+}
+```
+---
+
+`/block`
+
+**Method:** `POST`
+
+**Data:** JSON with `address` and `star` attributes.
+
+```json
+{
+  address: string,
+  star: {
+    dec: string,
+    ra: string,
+    story: string
+    mag: string,
+    con: string
+  }
+}
+```
+
+**Returns:** JSON with newly created star block data.
+
+```json
+{
+    hash: string,
+    height: int,
+    body: {
+        address: string,
+        star: {
+            dec: string,
+            ra: string,
+            story: string,
+            mag: string or null,
+            con: string or null
+        }
+    },
+    time: date,
+    previousBlockHash: string
+}
+```
+
+**Example:** 
+
+```bash
+$ curl -X POST -d '{"address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF", "star": {"dec": "69° 7' 5", "ra": "10h 12m 2s", "story": "Found star using https://www.google.com/sky/"}}' -H 'Content-Type: application/json' http://127.0.0.1:8000/block/
+{
+  "address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF",
+  "star": {
+    "dec": "69° 7' 5",
+    "ra": "10h 12m 2s",
+    "story": "Found star using https://www.google.com/sky/"
+  }
+}
+```
+---
+`/stars/address:[address]`
+
+**Method:** `GET`
+
+**Returns:** Array of JSON with matching `address`.
+
+**Example:** 
+
+```bash
+$ curl http://127.0.0.1:8000/stars/address:15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF
+[
+    {
+        "hash": "dd2a7539ecd972f4106c9eae892164e04c89da9f0b7260829cd3d595b82693d7",
+        "height": 1,
+        "body": {
+            "address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF",
+            "star": {
+                "dec": "-26° 29'' 24.9",
+                "ra": "16h 29m 1.0s",
+                "story": "Found star using https://www.google.com/sky/",
+                "mag": null,
+                "con": null
+            }
+        },
+        "time": "1540611764",
+        "previousBlockHash": "7728b6c324c091afc100944086a063c59cd6b70d91d6a28678115df87fae69f3"
+    },
+    {
+        "hash": "3f26228581515ba67d33d3e103ddae1be33106ec79d3e033bea3cef49b40755d",
+        "height": 2,
+        "body": {
+            "address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF",
+            "star": {
+                "dec": "-26° 29'' 24.9",
+                "ra": "16h 29m 1.0s",
+                "story": "Found star using https://www.google.com/sky/",
+                "mag": null,
+                "con": null
+            }
+        },
+        "time": "1540957788",
+        "previousBlockHash": "dd2a7539ecd972f4106c9eae892164e04c89da9f0b7260829cd3d595b82693d7"
+    },
+    {
+        "hash": "e971031b82cc687681900b188f94c0528e8cede0a1649001d33d507b7926d586",
+        "height": 3,
+        "body": {
+            "address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF",
+            "star": {
+                "dec": "69° 6' 33",
+                "ra": "10h 12m 24s",
+                "story": "Found star using https://www.google.com/sky/",
+                "mag": null,
+                "con": null
+            }
+        },
+        "time": "1540957812",
+        "previousBlockHash": "3f26228581515ba67d33d3e103ddae1be33106ec79d3e033bea3cef49b40755d"
+    },
+    {
+        "hash": "0e99a7ab14f3d62063cae65b1db3705686d1e4dee8a00bc3e60bf75d686221c3",
+        "height": 4,
+        "body": {
+            "address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF",
+            "star": {
+                "dec": "69° 7' 5",
+                "ra": "10h 12m 2s",
+                "story": "Found star using https://www.google.com/sky/",
+                "mag": null,
+                "con": null
+            }
+        },
+        "time": "1540957833",
+        "previousBlockHash": "e971031b82cc687681900b188f94c0528e8cede0a1649001d33d507b7926d586"
+    }
+]
+```
+---
+`/stars/hash:[hash]`
 
 **Method:** `GET`
 
 **Returns:** JSON with specified block data.
+
+**Example:** 
+
+```bash
+$ curl http://127.0.0.1:8000/stars/hash:0e99a7ab14f3d62063cae65b1db3705686d1e4dee8a00bc3e60bf75d686221c3
+{
+    "hash": "0e99a7ab14f3d62063cae65b1db3705686d1e4dee8a00bc3e60bf75d686221c3",
+    "height": 4,
+    "body": {
+        "address": "15U4AnCwdRYT5WJdtejHKK6UMSiShVFMQF",
+        "star": {
+            "dec": "69° 7' 5",
+            "ra": "10h 12m 2s",
+            "story": "Found star using https://www.google.com/sky/",
+            "mag": null,
+            "con": null
+        }
+    },
+    "time": "1540957833",
+    "previousBlockHash": "e971031b82cc687681900b188f94c0528e8cede0a1649001d33d507b7926d586"
+}
+```
+---
+`/block/[height]`
+
+**Method:** `GET`
+
+**Returns:** JSON with star block data at height `height`.
 
 **Example:** 
 
@@ -110,34 +353,6 @@ $ curl http://127.0.0.1:8000/block/0
 	"body":"First block in the chain - Genesis block",
 	"time":"1536001430",
 	"previousBlockHash":""
-}
-```
----
-
-`/block`
-
-**Method:** `POST`
-
-**Data:** JSON with `body` attribute.
-
-```json
-{
-	body: string
-}
-```
-
-**Returns:** JSON with newly created block data.
-
-**Example:** 
-
-```bash
-$ curl -X POST -d '{"body": "new block"}' -H 'Content-Type: application/json' http://127.0.0.1:8000/block/
-{
-	"hash":"806a0722dee8f7b44c0a707dad61f4fd7b0f0862baa8d8769846d3af32a00d50",
-	"height":1,
-	"body":"new block",
-	"time":"1536014999",
-	"previousBlockHash":"1f83837c86ad22bab823f4815ab28b498f3b4d781ae33d707f5aaba6afa19923"
 }
 ```
 ---
