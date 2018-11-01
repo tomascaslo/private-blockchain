@@ -13,16 +13,18 @@ const router = express.Router();
 
 router
 .post('/requestValidation', async (req, res) => {
+  const blockchain = global.blockchain;
   const address = req.body.address;
-  const starRegistry = new StarRegistry();
+  const starRegistry = new StarRegistry(blockchain);
   const data = await starRegistry.getAddressData(address);
 
   res.json(data);
 })
 .post('/message-signature/validate', async (req, res) => {
+  const blockchain = global.blockchain;
   const address = req.body.address;
   const signature = req.body.signature;
-  const starRegistry = new StarRegistry();
+  const starRegistry = new StarRegistry(blockchain);
   let validationResponse = null
 
   try {

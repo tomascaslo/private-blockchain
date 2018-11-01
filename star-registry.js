@@ -88,7 +88,6 @@ class StarRegistry {
   }
 
   async getStarsForAddress(address) {
-    console.log(this.blockchain);
     return await this.blockchain.findEntriesByObjectProp('body.address', address);
   }
 
@@ -97,6 +96,15 @@ class StarRegistry {
     const entries = await this.blockchain.findEntriesByObjectProp('hash', hash, firstMatch);
     const star = entries.length > 0 ? entries[0] : null;
     return star;
+  }
+
+  async isValid(address) {
+    let data = await this.notary.getData(address);
+    if (data && this.isWithinValidationWindow(data)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
 }

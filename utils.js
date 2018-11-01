@@ -20,10 +20,35 @@ function validateProperty(obj, prop, required=false) {
   }
 }
 
+function validateStringMaxLength(str, maxLength) {
+  if (str.length > maxLength) {
+    stringMaxLengthExceededError(str, maxLength);
+  }
+  return str;
+}
+
+function validateIsASCII(str) {
+  const isASCII = s => /^[\x00-\x7F]*$/.test(s);
+  if (!isASCII(str)) {
+    stringIsNotASCIIError(str);
+  }
+  return str;
+}
+
 function propertyRequiredError(prop) {
   throw new Error(`Property ${prop} is required.`);
 }
 
+function stringMaxLengthExceededError(str, maxLength) {
+  throw new Error(`String maximun length exceeded for string "${str}" (${str.length} > ${maxLength}).`);
+}
+
+function stringIsNotASCIIError(str) {
+  throw new Error(`String "${str}" should be ASCII.`);
+}
+
 module.exports = {
   validateProperty,
-}
+  validateStringMaxLength,
+  validateIsASCII,
+};

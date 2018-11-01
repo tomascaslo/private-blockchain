@@ -1,6 +1,12 @@
 'use strict';
 
-const { validateProperty } = require('./utils');
+const {
+  validateProperty,
+  validateStringMaxLength,
+  validateIsASCII,
+} = require('./utils');
+
+const MAX_STORY_BYTES = 250; // ASCII chars
 
 class Star {
   constructor(body) {
@@ -10,7 +16,9 @@ class Star {
     this.star = star;
     this.star.dec = validateProperty(star, 'dec', true);
     this.star.ra = validateProperty(star, 'ra', true);
-    this.star.story = validateProperty(star, 'story', true);
+    this.star.story = validateStringMaxLength(
+      validateIsASCII(validateProperty(star, 'story', true)),
+      MAX_STORY_BYTES);
     this.star.mag = validateProperty(star, 'mag');
     this.star.con = validateProperty(star, 'con');
   }

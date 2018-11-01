@@ -3,8 +3,9 @@
 const express = require('express');
 const debug = require('debug')('api:block');
 const { Block } = require('../simpleChain');
+const StarRegistry = require('../star-registry');
 const Star = require('../star');
-const { NotFound, InternalServerError } = require('./utils/http-status-codes');
+const { NotFound, InternalServerError, BadRequest } = require('./utils/http-status-codes');
 const router = express.Router();
 
 router
@@ -25,12 +26,23 @@ router
     res.status(NotFound).send('Block Not Found');
   }
 })
-.post('/', async (req, res, next) => {
+.post('/', async (req, res, next) => { // TODO: Move all this logic elsewhere.
   const blockchain = global.blockchain;
   const body = req.body || {};
-  const star = new Star(body);
-  // Create new block
-  const block = new Block(star);
+  const starRegistry = new StarRegistry(blockchain);
+  const isValid = await starRegistry.isValid(body.address);
+
+  if (!isValid) {
+    return res.status(BadRequest).send(`Registration of stars for address ${body.address} has expired. Please request a new token for validation at /requestValidation.`);
+  }
+
+  let star, block;
+  try {
+    star = new Star(body);
+    block = new Block(star);
+  } catch(e) {
+    return res.status(BadRequest).send(e.message);
+  }
 
   try {
     await blockchain.addBlock(block);
