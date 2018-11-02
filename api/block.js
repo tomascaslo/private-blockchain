@@ -10,12 +10,15 @@ const router = express.Router();
 
 router
 .get('/:height(\\d+)', async (req, res, next) => {
-  // Get block height
-  const height = parseInt(req.params.height);
   const blockchain = global.blockchain;
+  const height = parseInt(req.params.height);
   debug(`Getting block ${height}.`);
+
   try {
     const block = await blockchain.getBlock(height);
+    const star = new Star(block.body);
+    star.decodeStory();
+    block.body.star = star;
     debug('Got block.');
 
     // Return response
@@ -25,6 +28,7 @@ router
     // Return error
     res.status(NotFound).send('Block Not Found');
   }
+
 })
 .post('/', async (req, res, next) => { // TODO: Move all this logic elsewhere.
   const blockchain = global.blockchain;
@@ -39,6 +43,7 @@ router
   let star, block;
   try {
     star = new Star(body);
+    star.encodeStory(); // Need to encode story to hex before saving.
     block = new Block(star);
   } catch(e) {
     return res.status(BadRequest).send(e.message);

@@ -1,5 +1,6 @@
 'use strict';
 
+const Star = require('./star');
 const NotaryDB = require('./db/notary');
 const bitcoin = require('bitcoinjs-lib');
 const bitcoinMessage = require('bitcoinjs-message'); 
@@ -88,14 +89,21 @@ class StarRegistry {
   }
 
   async getStarsForAddress(address) {
-    return await this.blockchain.findEntriesByObjectProp('body.address', address);
+    const blocks = await this.blockchain.findEntriesByObjectProp('body.address', address);
+    for (let i = 0; i < blocks.length; i++) {
+      this.prepareBlockForSend(blocks[i]);
+    }
+    return blocks;
   }
 
   async getStarByHash(hash) {
     const firstMatch = true;
-    const entries = await this.blockchain.findEntriesByObjectProp('hash', hash, firstMatch);
-    const star = entries.length > 0 ? entries[0] : null;
-    return star;
+    const blocks = await this.blockchain.findEntriesByObjectProp('hash', hash, firstMatch);
+    const block = blocks.length > 0 ? blocks[0] : null;
+    if (block) {
+      this.prepareBlockForSend(block);
+    }
+    return block;
   }
 
   async isValid(address) {
@@ -105,6 +113,13 @@ class StarRegistry {
     } else {
       return false;
     }
+  }
+
+  prepareBlockForSend(block) {
+    const starData = block.body;
+    const star = new Star(starData);
+    star.decodeStory();
+    block.body.star = star;
   }
 
 }

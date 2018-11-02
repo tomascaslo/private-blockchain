@@ -47,8 +47,23 @@ function stringIsNotASCIIError(str) {
   throw new Error(`String "${str}" should be ASCII.`);
 }
 
+function encodeString(from, to) {
+  return str => Buffer.from(str, from).toString(to);
+}
+
+function asciiToHex(str) {
+  return encodeString('ascii', 'hex')(str);
+}
+
+function hexToAscii(str) {
+  return encodeString('hex', 'ascii')(str);
+}
+
+
 module.exports = {
   validateProperty,
   validateStringMaxLength,
   validateIsASCII,
+  asciiToHex,
+  hexToAscii,
 };
