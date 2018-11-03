@@ -5,13 +5,12 @@ const {
   validateStringMaxLength,
   validateIsASCII,
   asciiToHex,
-  hexToAscii,
+  hexToAscii
 } = require('./utils');
 
 const MAX_STORY_BYTES = 250; // ASCII chars
 
 class Star {
-
   constructor(body) {
     let { address, star = {} } = body;
     let { dec, ra, story, mag, con } = star;
@@ -27,7 +26,8 @@ class Star {
   validateStory(story, star) {
     return validateStringMaxLength(
       validateIsASCII(validateProperty(star, 'story', true)),
-      MAX_STORY_BYTES);
+      MAX_STORY_BYTES
+    );
   }
 
   encodeStory() {
@@ -35,9 +35,8 @@ class Star {
   }
 
   decodeStory() {
-    this.star.story = hexToAscii(this.star.story);
+    this.star.storyDecoded = hexToAscii(this.star.story);
   }
-
 }
 
 module.exports = Star;

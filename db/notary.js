@@ -10,12 +10,12 @@ const defaultDBName = npmEvent ? 'notary-' + npmEvent : 'notary';
 // Supported levelDB actions for chainDB
 // nargs - refers to the number of arguments for action
 const chainDBActions = {
-  'put': {'nargs': 2},
-  'get': {'nargs': 1},
-}
+  put: { nargs: 2 },
+  get: { nargs: 1 },
+  del: { nargs: 1 }
+};
 
 class NotaryDB extends BaseDB {
-
   getDefaultName() {
     return defaultDBName;
   }
@@ -25,12 +25,12 @@ class NotaryDB extends BaseDB {
   }
 
   // Overrides getData()
-  async getData(key){
+  async getData(key) {
     try {
       let value = await this.run('get', key);
       debug('Value = ' + value);
       return JSON.parse(value);
-    } catch(err) {
+    } catch (err) {
       debug('Not found!', err);
       return null;
     }
@@ -41,6 +41,9 @@ class NotaryDB extends BaseDB {
     return data;
   }
 
+  async deleteDataForKey(key) {
+    await this.run('del', key);
+  }
 }
 
 module.exports = NotaryDB;

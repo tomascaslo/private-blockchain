@@ -3,12 +3,11 @@
 const Star = require('./star');
 const NotaryDB = require('./db/notary');
 const bitcoin = require('bitcoinjs-lib');
-const bitcoinMessage = require('bitcoinjs-message'); 
+const bitcoinMessage = require('bitcoinjs-message');
 
 const VALIDATION_WINDOW = 300; // seconds
 
 class StarRegistry {
-
   constructor(blockchain) {
     this.notary = new NotaryDB();
     this.blockchain = blockchain.chain;
@@ -35,7 +34,7 @@ class StarRegistry {
       address,
       timestamp,
       message,
-      validationWindow: VALIDATION_WINDOW,
+      validationWindow: VALIDATION_WINDOW
     };
 
     return await this.notary.saveData(addressData);
@@ -49,7 +48,7 @@ class StarRegistry {
     const message = data.message;
     const updatedData = await this.updateTimestamp(data);
     const registration = {
-      'status': updatedData
+      status: updatedData
     };
 
     if (bitcoinMessage.verify(message, address, signature)) {
@@ -72,24 +71,30 @@ class StarRegistry {
     }
     const now = new Date().getTime() / 1000; // UTC sec
 
-    return (now - (data.timestamp / 1000)) < data.validationWindow;
+    return now - data.timestamp / 1000 < data.validationWindow;
   }
 
   async updateTimestamp(data) {
-    data = Object.assign({}, data, { validationWindow: this.getNewValidationWindow(data) });
+    data = Object.assign({}, data, {
+      validationWindow: this.getNewValidationWindow(data)
+    });
 
     return await this.notary.saveData(data);
   }
 
   getNewValidationWindow(data) {
     const now = new Date().getTime() / 1000; // UTC ms
-    const newValidationWindow = VALIDATION_WINDOW - (now - (data.timestamp / 1000));
+    const newValidationWindow =
+      VALIDATION_WINDOW - (now - data.timestamp / 1000);
 
     return Math.floor(newValidationWindow);
   }
 
   async getStarsForAddress(address) {
-    const blocks = await this.blockchain.findEntriesByObjectProp('body.address', address);
+    const blocks = await this.blockchain.findEntriesByObjectProp(
+      'body.address',
+      address
+    );
     for (let i = 0; i < blocks.length; i++) {
       this.prepareBlockForSend(blocks[i]);
     }
@@ -98,7 +103,11 @@ class StarRegistry {
 
   async getStarByHash(hash) {
     const firstMatch = true;
-    const blocks = await this.blockchain.findEntriesByObjectProp('hash', hash, firstMatch);
+    const blocks = await this.blockchain.findEntriesByObjectProp(
+      'hash',
+      hash,
+      firstMatch
+    );
     const block = blocks.length > 0 ? blocks[0] : null;
     if (block) {
       this.prepareBlockForSend(block);
@@ -122,6 +131,9 @@ class StarRegistry {
     block.body.star = star;
   }
 
+  async deleteDataForAddress(address) {
+    await this.notary.deleteDataForKey(address);
+  }
 }
 
 module.exports = StarRegistry;
