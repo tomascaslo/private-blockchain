@@ -20,9 +20,14 @@ router
 
     try {
       const block = await blockchain.getBlock(height);
-      const star = new Star(block.body);
-      star.decodeStory();
-      block.body.star = star;
+
+      // Since block 0 body has a different format (string).
+      if (height > 0) {
+        const star = new Star(block.body);
+        star.decodeStory();
+        block.body.star = star;
+      }
+
       debug('Got block.');
 
       // Return response
